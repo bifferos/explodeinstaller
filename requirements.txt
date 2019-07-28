@@ -1,4 +1,4 @@
-lzma
+backports.lzma
 pycdlib
 isoparser
 six
