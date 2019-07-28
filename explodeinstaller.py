@@ -1,16 +1,23 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
+
+"""
+Although this is partially working with Python 3, please use python2 for the time being.  The dependent
+isoparser library doesn't seem to work properly.
+"""
+
 import os
-import sys
-import shutil
 import isoparser
 import pycdlib
 import ext_init_cpio
 from subprocess import Popen, PIPE
 import argparse
-from StringIO import StringIO
-from backports import lzma
+try:
+    import lzma
+except ImportError:
+    from backports import lzma
 import gzip
 import json
+import six
 
 # The location of any initrd images is specific to each distribution and bootloader.  Since these are simply
 # compressed cpio archives it would be expensive to figure out where they are.  Easiest way to deal with them
@@ -22,8 +29,9 @@ def extract_one_iso_file(iso_in, iso_parser, src, dest):
     local_path = dest + src
     try:
         iso_in.get_file_from_iso(local_path, rr_path=src)
-    except pycdlib.pycdlibexception.PyCdlibInvalidInput, e:
-        if e.message == "Symlinks have no data associated with them":
+    except pycdlib.pycdlibexception.PyCdlibInvalidInput as e:
+        print(repr(str(e)))
+        if str(e) == "Symlinks have no data associated with them":
             if os.path.exists(local_path):
                 os.unlink(local_path)
             local_dir, local_link_name = os.path.split(local_path)
@@ -32,19 +40,19 @@ def extract_one_iso_file(iso_in, iso_parser, src, dest):
             created = False
             for i in record.susp_entries:
                 if i.signature == "SL":
-                    print i.path
+                    print(i.path)
                     old_dir = os.getcwd()
                     os.chdir(local_dir)
-                    print "Creating link", i.path, local_link_name
+                    print("Creating link", i.path, local_link_name)
                     os.symlink(i.path, local_link_name)
                     created = True
                     os.chdir(old_dir)
             if not created:
                 raise ValueError("Found symlink, but can't find SUSP entry for target")
-        elif e.message == "Cannot write out a file without data":
+        elif str(e) == "Cannot write out a file without data":
             src = src.split("/")[1:]
             data = iso_parser.record(*src).content
-            print "Alternative Extraction", local_path
+            print("Alternative Extraction", local_path)
             open(local_path, "wb").write(data)
         else:
             raise ValueError("Unrecognised exception")
@@ -63,7 +71,7 @@ def walk_iso(iso_file, isofs_dir):
     for path, dirs, files in iso_in.walk(rr_path="/"):
         for dirname in dirs:
             dst = isofs_dir + os.path.join(path, dirname)
-            print "creating  dir:", dst
+            print("creating  dir %r" % dst)
             os.mkdir(dst)
         for file in files:
             src = os.path.join(path, file)
@@ -85,7 +93,7 @@ def walk_initrd(initrd_path, initrd_dir):
 
     print("Extracting initrd at %r" % initrd_path)
     fp = opener(initrd_path)
-    fp_out = StringIO()
+    fp_out = six.StringIO()
     ext_init_cpio.g_inodes = {}
     while ext_init_cpio.process_entry(fp, initrd_dir, fp_out):
         pass
