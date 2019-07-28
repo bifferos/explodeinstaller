@@ -6,6 +6,7 @@
 """
 
 import os
+import sys
 import json
 import six
 import argparse
@@ -51,7 +52,7 @@ def get_file_opener(name):
 
 
 def gen_init_cpio(spec, output, type_str):
-    p = Popen(["./gen_init_cpio", spec], stdout=PIPE)
+    p = Popen([os.path.join(sys.path[0],"gen_init_cpio"), spec], stdout=PIPE)
     data = p.communicate("")[0]
     opener = get_file_opener(type_str)
     with opener(output, "wb") as fp:
