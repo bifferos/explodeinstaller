@@ -114,7 +114,7 @@ change the location an initrd gets written to you'll need to edit the hidden
 file .index in the top level of the exploded directory.  You'll see this is
 a json file indicating meta-data that needs to be stored between execution
 of the exploder and the assembler.  It also determines the compression to be
-used when re-packing.
+used when re-packing the initrds.
 
 
 Assumptions
@@ -135,7 +135,7 @@ have to be added to the source.  This won't be too hard.
 
 Another thing about compression is that explodeinstaller doesn't figure 
 out what options were used on the original ISO, so recompressing may not
-result in the same sized file.
+result in the same sized initrd file.
 
 Two ISO reading libraries are used:  pycdlib and isoparser.  pycdlib is
 quite fast but doesn't handle links or reading the boot image properly.
