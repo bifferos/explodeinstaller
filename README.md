@@ -35,7 +35,8 @@ Usage is simple.  Run as:
 You will see that the contents of the ISO are written to the output
 directory.  Example:
 
-```./explodeinstaller.py /tmp/slackware64-14.2-install-dvd.iso tmp_iso
+```
+./explodeinstaller.py /tmp/slackware64-14.2-install-dvd.iso tmp_iso
 ```
 
 This creates a structure like this:
@@ -74,7 +75,8 @@ This format is described in the gen_init_cpio help output.
 
 Recreate your new file with:
 
-```./gen_init_cpio tmp_iso/isofs/isolinux/initrd.img > new_initrd.img
+```
+./gen_init_cpio tmp_iso/isofs/isolinux/initrd.img > new_initrd.img
 ```
 Now you can compress it, then copy it back over the original iso file
 location at 'tmp_iso/isofs/isolinux/initrd.img' and you should be able
