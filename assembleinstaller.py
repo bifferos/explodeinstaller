@@ -43,20 +43,20 @@ def mkisofs(file_path, iso_name):
     p.communicate("")
 
 
-def get_file_opener(name):
+def get_file_opener(name, output):
     if name == "gzip":
-        return gzip.open
+        return gzip.open(output, "wb")
     if name == "lzma":
-        return lzma.open
+        return lzma.open(output, "wb", check=lzma.CHECK_CRC32)
     raise ValueError("Unexpected compression type")
 
 
 def gen_init_cpio(spec, output, type_str):
     p = Popen([os.path.join(sys.path[0],"gen_init_cpio"), spec], stdout=PIPE)
     data = p.communicate("")[0]
-    opener = get_file_opener(type_str)
-    with opener(output, "wb") as fp:
-        fp.write(data)
+    fp = get_file_opener(type_str, output)
+    fp.write(data)
+    fp.close()
     print("Written file %r with %r compression" % (output, type_str))
 
 
