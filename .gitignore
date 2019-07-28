@@ -1,0 +1,5 @@
+*~
+gen_init_cpio
+*.pyc
+.idea/*
+tmp_iso/
