@@ -60,13 +60,16 @@ def gen_init_cpio(spec, output, type_str):
     print("Written file %r with %r compression" % (output, type_str))
 
 
-def assemble_all(dir_path, iso_name):
+def assemble_all(dir_path, iso_name, skip):
+    if not os.path.isdir(dir_path):
+        raise ValueError("dir path doesn't exist")
     meta = json.loads(open(os.path.join(dir_path,".index"), "rb").read())
     isofs_path = os.path.join(dir_path, meta["ISO"])
 
-    for escaped, actual in six.iteritems(meta["initrds"]):
-        output_path = isofs_path + actual[0]
-        gen_init_cpio(actual[1], output_path, actual[2])
+    if not skip:
+        for escaped, actual in six.iteritems(meta["initrds"]):
+            output_path = isofs_path + actual[0]
+            gen_init_cpio(actual[1], output_path, actual[2])
 
     mkisofs(isofs_path, iso_name)
 
@@ -75,8 +78,9 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("dir", help="directory created by explodeinstaller.")
     parser.add_argument("iso", help="iso image to create")
+    parser.add_argument("--skiprd", action="store_true", default=False, help='skip compression of initrds')
     args = parser.parse_args()
-    assemble_all(args.dir, args.iso)
+    assemble_all(args.dir, args.iso, args.skiprd)
 
 
 if __name__ == "__main__":
