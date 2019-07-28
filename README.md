@@ -1,3 +1,6 @@
+Introduction
+============
+
 explodeinstaller: ISO Extraction utility
 
 This extraction utility has been writen to assist in the automated
