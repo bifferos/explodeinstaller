@@ -33,14 +33,52 @@ Usage is simple.  Run as:
  ./explodeinstaller.py <iso name> <output directory>
 
 You will see that the contents of the ISO are written to the output
-directory.  There will be one 'isofs' subdir and zero or more initrd
+directory.  Example:
+
+```./explodeinstaller.py /tmp/slackware64-14.2-install-dvd.iso tmp_iso
+```
+
+This creates a structure like this:
+
+```bash
+└── tmp_iso
+    ├── _EFI_BOOT_initrd.img
+    ├── _isolinux_initrd.img
+    └── isofs
+```
+
+There will be one 'isofs' subdir and zero or more initrd
 subdirs.  Extracted initrds are prefixed with an underscore '_'.  If 
 you want to add files to the initrd you need to do two things:  
  - First you need to add the file to the relevant initrd directory.  
  - Then, you need to update the spec file.
 
 Under the 'isofs' directory you will see that the initrd contents have been
-replaced by a text file,  With an entry per file or device node in the initrd.
+replaced by a text file with a line per included  entry, for example:
+
+```bash
+bash-5.0$ head tmp_iso/isofs/isolinux/initrd.img 
+slink cdrom /var/log/mount 777 0 0
+dir bin 755 0 0
+slink bin/rm busybox 777 0 0
+file bin/gzip tmp_iso/_isolinux_initrd.img/bin/gzip 755 0 0
+slink bin/logname busybox 777 0 0
+file bin/uuidgen tmp_iso/_isolinux_initrd.img/bin/uuidgen 755 0 0
+slink bin/pstree busybox 777 0 0
+file bin/tar-1.13 tmp_iso/_isolinux_initrd.img/bin/tar-1.13 755 0 0
+file bin/busybox tmp_iso/_isolinux_initrd.img/bin/busybox 755 0 0
+slink bin/watch busybox 777 0 0
+```
+
 This format is described in the gen_init_cpio help output.
+
+Recreate your new file with:
+
+```./gen_init_cpio tmp_iso/isofs/isolinux/initrd.img > new_initrd.img
+```
+Now you can compress it, then copy it back over the original iso file
+location at 'tmp_iso/isofs/isolinux/initrd.img' and you should be able
+to recreate your install DVD.
+
 
 
