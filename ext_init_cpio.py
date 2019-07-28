@@ -1,5 +1,11 @@
 #!/usr/bin/env python2
 
+"""
+   Copyright (c) Bifferos (bifferos@gmail.com) 2019.
+   Permission is given to use this code for any purpose.  Derived works must contain this copyright notice.
+"""
+
+
 import os
 import argparse
 import sys

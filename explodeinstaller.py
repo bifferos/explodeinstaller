@@ -1,8 +1,8 @@
 #!/usr/bin/env python2
 
 """
-Although this is partially working with Python 3, please use python2 for the time being.  The dependent
-isoparser library doesn't seem to work properly.
+   Copyright (c) Bifferos (bifferos@gmail.com) 2019.
+   Permission is given to use this code for any purpose.  Derived works must contain this copyright notice.
 """
 
 import os
@@ -30,7 +30,6 @@ def extract_one_iso_file(iso_in, iso_parser, src, dest):
     try:
         iso_in.get_file_from_iso(local_path, rr_path=src)
     except pycdlib.pycdlibexception.PyCdlibInvalidInput as e:
-        print(repr(str(e)))
         if str(e) == "Symlinks have no data associated with them":
             if os.path.exists(local_path):
                 os.unlink(local_path)
@@ -82,14 +81,14 @@ def get_file_opener(path):
     p = Popen(["file", path], stdout=PIPE)
     out, err = p.communicate("")
     if out.find("gzip") != -1:
-        return gzip.open
+        return gzip.open, "gzip"
     elif out.find("XZ compressed data") != -1:
-        return lzma.open
+        return lzma.open, "lzma"
     raise ValueError("Unexpected compression type")
 
 
 def walk_initrd(initrd_path, initrd_dir):
-    opener = get_file_opener(initrd_path)
+    opener, type_str = get_file_opener(initrd_path)
 
     print("Extracting initrd at %r" % initrd_path)
     fp = opener(initrd_path)
@@ -98,7 +97,9 @@ def walk_initrd(initrd_path, initrd_dir):
     while ext_init_cpio.process_entry(fp, initrd_dir, fp_out):
         pass
     # Replace the original initrd file with the spec
-    open(initrd_path, "wb").write(fp_out.getvalue())
+    spec = initrd_dir+".spec"
+    open(spec, "wb").write(fp_out.getvalue())
+    return spec, type_str
 
 
 def extract_all(iso_file, out_dir):
@@ -110,17 +111,20 @@ def extract_all(iso_file, out_dir):
     walk_iso(iso_file, isofs_dir)
     index = {"ISO": iso_explode_path}
 
+    initrds = {}
+
     for image in INITRD_IMAGES:
         initrd_path = isofs_dir + image
         if not os.path.exists(initrd_path):
             print("Skipping initrd path %r, doesn't exist" % initrd_path)
             continue
         escaped = image.replace("/", "_")
-        index[escaped] = image
         initrd_dir = os.path.join(out_dir, "%s" % escaped)
         os.mkdir(initrd_dir)
-        walk_initrd(initrd_path, initrd_dir)
+        spec, type_str = walk_initrd(initrd_path, initrd_dir)
+        initrds[escaped] = (image, spec, type_str)
 
+    index["initrds"] = initrds
     # Finally, make a dictionary to find everything.
     print("Writing index")
     open(os.path.join(out_dir, ".index"),"wb").write(json.dumps(index))
