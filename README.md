@@ -31,7 +31,7 @@ Usage
 Usage is simple.  Run as:
 
 ```
- ./explodeinstaller.py &lt;iso name&gt; &lt;output directory&gt;
+ ./explodeinstaller.py <iso name> <output directory>
 ```
 
 You will see that the contents of the ISO are written to the output
