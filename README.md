@@ -16,16 +16,19 @@ on a Mac (untested).
 Setup
 =====
 
-You require Python2 for this.  The code is mostly compatible with Python3
-patches welcome for a Python3 port.
+You require Python2 for this.  The code is mostly compatible with Python3.
+Patches are welcome for a Python3 port.
 
 Install the python modules in requirements.txt.  
-`sudo pip install -r requirements.txt` should do the trick.
+```
+sudo python2 -m pip install -r requirements.txt
+```
+should do the trick.
 
 Compile the gen_init_cpio program by just typing 'make'.  This is the
 same program found in the kernel sources at usr/gen_init_cpio.c, and
 is only included here to avoid the depency on the kernel sources.
-This is only required for re-assembly, not extraction.
+This is only required for re-assembly, not exploding.
 
 
 Exploding
@@ -85,11 +88,7 @@ dir bin 755 0 0
 slink bin/rm busybox 777 0 0
 file bin/gzip tmp_iso/_isolinux_initrd.img/bin/gzip 755 0 0
 slink bin/logname busybox 777 0 0
-file bin/uuidgen tmp_iso/_isolinux_initrd.img/bin/uuidgen 755 0 0
-slink bin/pstree busybox 777 0 0
-file bin/tar-1.13 tmp_iso/_isolinux_initrd.img/bin/tar-1.13 755 0 0
-file bin/busybox tmp_iso/_isolinux_initrd.img/bin/busybox 755 0 0
-slink bin/watch busybox 777 0 0
+etc....
 ```
 
 This format is described in the gen_init_cpio help output, so execute
@@ -140,12 +139,12 @@ result in the same sized file.
 
 Two ISO reading libraries are used:  pycdlib and isoparser.  pycdlib is
 quite fast but doesn't handle links or reading the boot image properly.
-isoparser is slow, but seems to fare better.  So pycdlib does extraction of 
+isoparser is slow, but seems to get better results.  So pycdlib does extraction of 
 most of the files, and when it throws an exception isoparser takes over. 
-This seems to be a good tradeoff, however if pycdlib gets 'fixed' then this
-code may break.
+This seems to be a good tradeoff, however if pycdlib gets 'fixed' and stops
+throwing exceptions then this code will obviously break.
 
 Although the code is compatible with Python 3, the exploder doesn't seem to
 work with it.  I'll continue to develop against six to leave the door open
-for a Python port to python3 but don't intend to spend any time actually
-getting it working when this meets my needs.  Patches welcome.
+for a Python port to 3 but don't intend to spend any time actually
+getting it working when this meets my needs.
