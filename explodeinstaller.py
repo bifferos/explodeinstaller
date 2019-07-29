@@ -27,7 +27,6 @@ INITRD_IMAGES = ["/EFI/BOOT/initrd.img", "/isolinux/initrd.img"]
 def extract_one_iso_file(iso_in, src, dest):
     local_path = dest + src
     record = iso_in.get_record(rr_path=src)
-    print(record)
     if record.is_file():
         if record.rock_ridge is not None and record.rock_ridge.is_symlink():
             local_dir, local_link_name = os.path.split(local_path)
