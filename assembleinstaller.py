@@ -18,21 +18,21 @@ except ImportError:
 import gzip
 
 
-def mkisofs(file_path, iso_name):
+def make_iso_fs(file_path, iso_name):
     iso_rel = os.path.join("..", "..", iso_name)
-    command = [ 'mkisofs', '-o', iso_rel, '-R', '-J', '-V', 'explodeinstaller',
+    command = [
+        'mkisofs', '-o', iso_rel, '-R', '-J', '-V', 'explode installer',
         '-hide-rr-moved', '-hide-joliet-trans-tbl',
-        '-v', '-d', '-N', '-no-emul-boot', '-boot-load-size', '4','-boot-info-table',
+        '-v', '-d', '-N', '-no-emul-boot', '-boot-load-size', '4', '-boot-info-table',
         '-b', 'isolinux/isolinux.bin',
         '-c', 'isolinux/isolinux.boot',
         '-sort', 'isolinux/iso.sort',
-        '-preparer',"assembleinstaller",
-        '-publisher', "assembleinstaller",
+        '-preparer', "assemble installer",
+        '-publisher', "assemble installer",
         '-A', "Slackware",
         '-eltorito-alt-boot', '-no-emul-boot', '-eltorito-platform', '0xEF', '-eltorito-boot',
         'isolinux/efiboot.img',
-        '.'
-    ]
+        '.']
     print(" ".join(command))
     p = Popen(command, shell=False, cwd=file_path)
     p.communicate("")
@@ -52,7 +52,7 @@ def get_file_opener(name, output):
 
 
 def gen_init_cpio(spec, output, type_str):
-    p = Popen([os.path.join(sys.path[0],"gen_init_cpio"), spec], stdout=PIPE)
+    p = Popen([os.path.join(sys.path[0], "gen_init_cpio"), spec], stdout=PIPE)
     data = p.communicate("")[0]
     fp = get_file_opener(type_str, output)
     fp.write(data)
@@ -63,7 +63,7 @@ def gen_init_cpio(spec, output, type_str):
 def assemble_all(dir_path, iso_name, skip):
     if not os.path.isdir(dir_path):
         raise ValueError("dir path doesn't exist")
-    meta = json.loads(open(os.path.join(dir_path,".index"), "rb").read())
+    meta = json.loads(open(os.path.join(dir_path, ".index"), "rb").read())
     isofs_path = os.path.join(dir_path, meta["ISO"])
 
     if not skip:
@@ -71,7 +71,7 @@ def assemble_all(dir_path, iso_name, skip):
             output_path = isofs_path + actual[0]
             gen_init_cpio(actual[1], output_path, actual[2])
 
-    mkisofs(isofs_path, iso_name)
+    make_iso_fs(isofs_path, iso_name)
 
 
 def main():
@@ -85,4 +85,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

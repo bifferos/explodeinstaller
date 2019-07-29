@@ -21,12 +21,13 @@ import six
 # The location of any initrd images is specific to each distribution and bootloader.  Since these are simply
 # compressed cpio archives it would be expensive to figure out where they are.  Easiest way to deal with them
 # Is hard-code the locations.  This list can be exhaustive, if any are missing they'll be ignored.
-INITRD_IMAGES = ["/EFI/BOOT/initrd.img","/isolinux/initrd.img"]
+INITRD_IMAGES = ["/EFI/BOOT/initrd.img", "/isolinux/initrd.img"]
 
 
 def extract_one_iso_file(iso_in, src, dest):
     local_path = dest + src
     record = iso_in.get_record(rr_path=src)
+    print(record)
     if record.is_file():
         if record.rock_ridge is not None and record.rock_ridge.is_symlink():
             local_dir, local_link_name = os.path.split(local_path)
@@ -56,8 +57,8 @@ def walk_iso(iso_file, isofs_dir):
             dst = isofs_dir + os.path.join(path, dirname)
             print("dir %s" % dst)
             os.mkdir(dst)
-        for file in files:
-            src = os.path.join(path, file)
+        for filename in files:
+            src = os.path.join(path, filename)
             extract_one_iso_file(iso_in, src, isofs_dir)
 
 
@@ -126,4 +127,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

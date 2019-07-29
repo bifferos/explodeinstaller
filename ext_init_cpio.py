@@ -5,11 +5,9 @@
    Permission is given to use this code for any purpose.  Derived works must contain this copyright notice.
 """
 
-
 import os
 import argparse
 import sys
-
 
 TYPE_SOCKET = 0o0140000
 TYPE_SLINK = 0o0120000
@@ -39,15 +37,15 @@ def process_entry(fp, out_dir, fp_out):
     cpio_mode = read8(fp)
     uid = read8(fp)
     gid = read8(fp)
-    nlink = read8(fp)
+    _nlink = read8(fp)
     mtime = read8(fp)
     filesize = read8(fp)
-    devmajor = read8(fp)
-    devminor = read8(fp)
+    _devmajor = read8(fp)
+    _devminor = read8(fp)
     rdevmajor = read8(fp)
     rdevminor = read8(fp)
     namesize = read8(fp) - 1
-    check = read8(fp)
+    _check = read8(fp)
 
     # read name
     name = fp.read(namesize)
@@ -73,9 +71,7 @@ def process_entry(fp, out_dir, fp_out):
     elif entry == TYPE_SLINK:
         fp_out.write(b"slink %s %s %o %d %d\n" % (name, file_data, mode, uid, gid))
     elif entry == TYPE_FILE:
-        hard_link = False
         if ino in g_inodes:
-            hard_link = True
             sys.stderr.write("Existing name: %r\n" % g_inodes[ino])
             sys.stderr.write("New name: %r\n" % name)
             raise ValueError("Can't deal with hard links, sorry")
@@ -85,8 +81,6 @@ def process_entry(fp, out_dir, fp_out):
         if not os.path.isdir(dir_name):
             os.makedirs(dir_name)
         fp_out.write(b"file %s %s %o %d %d\n" % (name, path.encode("utf-8"), mode, uid, gid))
-        if hard_link:
-            sys.stderr.write("Possible hard link:")
         open(path, "wb").write(file_data)
         os.utime(path, (mtime, mtime))
     elif entry == TYPE_NODE_BLOCK:
