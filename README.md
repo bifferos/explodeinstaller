@@ -9,8 +9,7 @@ other distributions.
 
 It differs from other scripts in that it allows editing of all files
 including the ramdisk contents without being root, and without resorting
-to FUSE or ISO mounting.  It therefore stands some chance of working
-on a Mac (untested).
+to FUSE or ISO mounting, it therefore works on a Mac.
 
 
 Setup
