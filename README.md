@@ -21,7 +21,7 @@ https://github.com/clalancette/pycdlib
 
 Install the python modules in requirements.txt.
 ```
-sudo python -m pip install -r requirements.txt
+sudo python -m pip3 install -r requirements3.txt
 ```
 should do the trick.
 
