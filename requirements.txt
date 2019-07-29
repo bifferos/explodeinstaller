@@ -1,5 +1,4 @@
-backports.lzma
-pycdlib
-isoparser
+backports.lzma;python_version<="2.7"
+lzma;python_version<"3.3"
 six
 

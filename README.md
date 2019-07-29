@@ -15,12 +15,13 @@ to FUSE or ISO mounting, it therefore works on a Mac.
 Setup
 =====
 
-You require Python2 for this.  The code is mostly compatible with Python3.
-Patches are welcome for a Python3 port.
+Install pycdlib, from github.  You require version 1.8, not released
+at time of writing.  Obtain pycdlib direct from:
+https://github.com/clalancette/pycdlib
 
-Install the python modules in requirements.txt.  
+Install the python modules in requirements.txt.
 ```
-sudo python2 -m pip install -r requirements.txt
+sudo python -m pip install -r requirements.txt
 ```
 should do the trick.
 
@@ -142,8 +143,3 @@ isoparser is slow, but seems to get better results.  So pycdlib does extraction 
 most of the files, and when it throws an exception isoparser takes over. 
 This seems to be a good tradeoff, however if pycdlib gets 'fixed' and stops
 throwing exceptions then this code will obviously break.
-
-Although the code is compatible with Python 3, the exploder doesn't seem to
-work with it.  I'll continue to develop against six to leave the door open
-for a Python port to 3 but don't intend to spend any time actually
-getting it working when this meets my needs.
