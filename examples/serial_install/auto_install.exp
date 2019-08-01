@@ -1,0 +1,158 @@
+#!/usr/bin/expect -f
+
+set VM_NAME slack_test
+
+set timeout 120
+exec VBoxManage startvm $VM_NAME
+spawn socat STDIO,rawer UNIX-CONNECT:/tmp/vbox,forever
+
+expect "Default kernel will boot in"
+expect "boot: "
+send "\r\n"
+
+expect "Enter 1 to select a keyboard map: "
+send "\n"
+
+expect "slackware login: "
+send "root\n"
+
+set prompt "root@slackware:/# "
+
+expect $prompt 
+send "echo start=2048 | sfdisk /dev/sda\n"
+expect $prompt 
+
+send "setup\n"
+
+
+# Expect a dialog containing given text
+proc expectDlg {txt} {
+    set IN "qq\x1b\\\[0;7m\x0f"
+    set OUT "\x1b\\\[0;7m\x0eqq"
+    expect "$IN$txt$OUT"
+}
+
+proc expectDlgRe {txt} {
+    set IN "qq\x1b\\\[0;7m\x0f"
+    set OUT "\x1b\\\[0;7m\x0eqq"
+    expect -re "$IN$txt$OUT"
+}
+
+
+# Target partition
+expectDlgRe "Slackware Linux Setup \\\(version .{1,8}\\\)"
+send "t\n"
+
+expectDlg "Select Linux installation partition:"
+send "\n"
+
+expectDlg "FORMAT PARTITION /dev/sda1"
+send "\n"
+
+expectDlg "SELECT FILESYSTEM FOR /dev/sda1"
+send "\n"
+
+expectDlg "DONE ADDING LINUX PARTITIONS TO /etc/fstab"
+send "\n"
+
+expectDlg "SOURCE MEDIA SELECTION"
+send "\n"
+
+expectDlg "SCANNING FOR CD or DVD DRIVE"
+send "\n"
+
+expectDlg "PACKAGE SERIES SELECTION"
+
+# Remove all package selections but 'a'
+send "a d e f k k l n t t x x x y "
+send "\n"
+
+# Full install
+expectDlg "SELECT PROMPTING MODE"
+send "f\n"
+
+expectDlg "MAKE USB FLASH BOOT"
+send "s\n"
+
+expectDlg "INSTALL LILO"
+send "\n"
+
+expectDlg "CONFIGURE LILO TO USE FRAME BUFFER CONSOLE?"
+send "\n"
+
+expectDlg "OPTIONAL LILO append=\"<kernel parameters>\" LINE"
+send "\n"
+
+expectDlg "USE UTF-8 TEXT CONSOLE?"
+send "\n"
+
+expectDlg "SELECT LILO DESTINATION"
+send "\n"
+
+expectDlg "MOUSE CONFIGURATION"
+send "\t\n"
+
+expectDlg "CONFIRM STARTUP SERVICES TO RUN"
+send "\n"
+
+expectDlg "CONSOLE FONT CONFIGURATION"
+send "\n"
+
+expectDlg "HARDWARE CLOCK SET TO UTC?"
+send "\n"
+
+# timezone -> GMT
+expectDlg "TIMEZONE CONFIGURATION"
+send "ggg\n"
+
+expectDlg "WARNING: NO ROOT PASSWORD DETECTED"
+send "\n"
+
+expect "New password: "
+send "vagrant\n"
+
+expect "New password: "
+send "vagrant\n"
+
+expect "Re-enter new password: "
+send "vagrant\n"
+
+expect "Press \\\[enter\\\] to continue:"
+send "\n"
+
+expectDlg "SETUP COMPLETE"
+send "\n"
+
+expectDlgRe "Slackware Linux Setup \\\(version .{1,8}\\\)"
+send "\t\n"
+
+expect $prompt
+
+send "chroot /mnt\n"
+expect $prompt
+
+
+# Lilo changes for serial port access
+send "cat /etc/lilo.conf | sed s/1200/10/ | sed \"s/#compact/compact/\" > /etc/lilo.conf_tmp\n"
+expect $prompt
+send "cat /etc/lilo.conf_tmp | sed \"s/utf8=0/utf8=0 console=ttyS0/\" > /etc/lilo.conf\n"
+expect $prompt
+send "lilo\n"
+expect $prompt
+
+# Serial getty to allow serial logins
+send "cat /etc/inittab | sed s/9600/115200/ | sed \"s/#s1/s1/\" > /etc/inittab_tmp\n"
+expect $prompt
+send "mv /etc/inittab_tmp /etc/inittab\n"
+expect $prompt
+
+# power off, wait for shutdown then eject DVD.
+send "poweroff\n"
+
+expect "reboot: Power down"
+expect eof
+catch wait result
+
+exec VBoxManage storageattach slack_test --storagectl IDE --port 1 --device 0 --type dvddrive --medium emptydrive
+
+
