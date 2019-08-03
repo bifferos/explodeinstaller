@@ -12,4 +12,4 @@ iso-read -e VBoxLinuxAdditions.run -i /opt/VirtualBox/additions/VBoxGuestAdditio
 	-o tmp_dir/isofs/extra/VBoxLinuxAdditions.run
  
 # Re-make the ISO.  Since we didn't change the initrds, can skip their recreation.
-../../assembleinstaller.py --skiprd tmp_dir generated.iso
+../../assembleinstaller.py tmp_dir generated.iso

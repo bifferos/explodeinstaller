@@ -136,10 +136,3 @@ have to be added to the source.  This won't be too hard.
 Another thing about compression is that explodeinstaller doesn't figure 
 out what options were used on the original ISO, so recompressing may not
 result in the same sized initrd file.
-
-Two ISO reading libraries are used:  pycdlib and isoparser.  pycdlib is
-quite fast but doesn't handle links or reading the boot image properly.
-isoparser is slow, but seems to get better results.  So pycdlib does extraction of 
-most of the files, and when it throws an exception isoparser takes over. 
-This seems to be a good tradeoff, however if pycdlib gets 'fixed' and stops
-throwing exceptions then this code will obviously break.

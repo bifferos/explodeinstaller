@@ -80,9 +80,13 @@ def walk_initrd(initrd_path, initrd_dir):
     ext_init_cpio.g_inodes = {}
     while ext_init_cpio.process_entry(fp, initrd_dir, fp_out):
         pass
-    # Replace the original initrd file with the spec
+    # Write out the spec file
     spec = initrd_dir+".spec"
     open(spec, "wb").write(fp_out.getvalue())
+    # Update the mtime of the spec file to the same as the original initrd file.
+    # This will give us a hint if it's been edited when we re-assemble.
+    mtime = os.stat(initrd_path).st_mtime
+    os.utime(spec, (mtime, mtime))
     return spec, type_str
 
 

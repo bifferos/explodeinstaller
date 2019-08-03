@@ -63,6 +63,8 @@ send "\n"
 
 expectDlg "PACKAGE SERIES SELECTION"
 
+interact
+
 # Remove all package selections but 'a'
 send "a d e f k k l n t t x x x y "
 send "\n"
@@ -154,5 +156,4 @@ expect eof
 catch wait result
 
 exec VBoxManage storageattach slack_test --storagectl IDE --port 1 --device 0 --type dvddrive --medium emptydrive
-
 
