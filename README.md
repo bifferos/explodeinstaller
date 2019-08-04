@@ -19,7 +19,7 @@ Install pycdlib, from github.  You require version 1.8, not released
 at time of writing.  Obtain pycdlib direct from:
 https://github.com/clalancette/pycdlib
 
-Install the python modules in requirements.txt.
+Install the python modules in requirements[23].txt.
 ```
 sudo python -m pip3 install -r requirements3.txt
 ```
@@ -29,6 +29,12 @@ Compile the gen_init_cpio program by just typing 'make', and put it in
 your path.  This is the same program found in the kernel sources at 
 usr/gen_init_cpio.c, and is only included here to avoid the depency 
 on the kernel sources.  This is only required for re-assembly, not exploding.
+
+Finally, 
+```
+sudo python setup.py install
+```
+Will install the extension.
 
 
 Exploding
