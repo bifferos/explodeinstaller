@@ -1,4 +1,4 @@
-If you run the script ./auto_create_partition.sh providing an ISO as
+If you run the script ./auto_create_partition.py providing an ISO as
 argument the Slackware ISO will be patched to automatically create a
 single partition spanning the entire disk immediately prior to login.
 As a precaution, the partition will only be created if the MBR is in 

@@ -25,29 +25,24 @@ sudo python -m pip3 install -r requirements3.txt
 ```
 should do the trick.
 
-Compile the gen_init_cpio program by just typing 'make'.  This is the
-same program found in the kernel sources at usr/gen_init_cpio.c, and
-is only included here to avoid the depency on the kernel sources.
-This is only required for re-assembly, not exploding.
+Compile the gen_init_cpio program by just typing 'make', and put it in
+your path.  This is the same program found in the kernel sources at 
+usr/gen_init_cpio.c, and is only included here to avoid the depency 
+on the kernel sources.  This is only required for re-assembly, not exploding.
 
 
 Exploding
 =========
 
-Usage is simple.  Run as:
+Usage is simple.  From Python:
 
 ```
- ./explodeinstaller.py <iso name> <output directory>
+import explodeinstaller
+explodeinstaller.extract_all("slackware64-14.2-install-dvd.iso", "tmp_iso")
 ```
 
 You will see that the contents of the ISO are written to the output
-directory.  Example:
-
-```
-./explodeinstaller.py /tmp/slackware64-14.2-install-dvd.iso tmp_iso
-```
-
-This creates a directory structure like this:
+directory:
 
 ```bash
 └── tmp_iso
@@ -105,7 +100,8 @@ Once you've made any required changes to your set of files, you're ready to
 re-assemble.  Run:
 
 ```
-./assembleinstaller.py <exploded dir> <iso name>
+import explodeinstaller
+explodeinstaller.assemble_all("tmp_iso", "slackware_mod.iso")
 ```
 
 Any initrd directories will be re-packed into their respective positions in
