@@ -28,7 +28,7 @@ os.system("rm -rf %s" % temp_dir)
 explodeinstaller.extract_all(sys.argv[1], temp_dir)
 
 
-file_to_change = os.path.join(temp_dir,"_isolinux_initrd.img/etc/rc.d/rc.S"
+file_to_change = os.path.join(temp_dir,"_isolinux_initrd.img/etc/rc.d/rc.S")
 
 
 new_file = []
@@ -36,7 +36,7 @@ for line in open(file_to_change).readlines():
     if line.startswith('echo -n "slackware login: "'):
         print("Found marker, inserting new code")
         for nl in shell_addition:
-            new_file.append(nl)
+            new_file.append(nl+"\n")
     new_file.append(line)
 
 open(file_to_change, "wb").write("".join(new_file))
