@@ -18,7 +18,7 @@ explodeinstaller.extract_all(ISO_PATH, temp_dir)
 
 CFG="tmp_dir/isofs/isolinux/isolinux.cfg"
 
-data = b"serial 0 115200" + open(CFG, "rb").read()
+data = b"serial 0 115200\n" + open(CFG, "rb").read()
 data = data.replace("SLACK_KERNEL=huge.s", "SLACK_KERNEL=huge.s console=ttyS0")
 
 open(CFG, "wb").write(data)

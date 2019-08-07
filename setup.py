@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-
 from distutils.core import setup
 
 setup(name='Explode Installer',
@@ -9,6 +8,6 @@ setup(name='Explode Installer',
       author='bifferos',
       author_email='bifferos@gmail.com',
       url='https://github.com/bifferos/explodeinstaller',
-      packages=['explodeinstaller'],
+      py_modules=['explodeinstaller'],
      )
      
