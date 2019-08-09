@@ -1,10 +1,23 @@
 #!/usr/bin/expect -f
 
-set VM_NAME slack_test
+source includes.exp
 
-set timeout 120
+# Expect a dialog containing given text
+proc expectDlg {txt} {
+    set IN "qq\x1b\\\[0;7m\x0f"
+    set OUT "\x1b\\\[0;7m\x0eqq"
+    expect "$IN$txt$OUT"
+}
+
+proc expectDlgRe {txt} {
+    set IN "qq\x1b\\\[0;7m\x0f"
+    set OUT "\x1b\\\[0;7m\x0eqq"
+    expect -re "$IN$txt$OUT"
+}
+
+set timeout 240
 exec VBoxManage startvm $VM_NAME
-spawn socat STDIO,rawer UNIX-CONNECT:/tmp/vbox,forever
+spawn socat STDIO,rawer UNIX-CONNECT:$VBOX_SOCKET,forever
 
 expect "Default kernel will boot in"
 expect "boot: "
@@ -23,21 +36,6 @@ send "echo start=2048 | sfdisk /dev/sda\n"
 expect $prompt 
 
 send "setup\n"
-
-
-# Expect a dialog containing given text
-proc expectDlg {txt} {
-    set IN "qq\x1b\\\[0;7m\x0f"
-    set OUT "\x1b\\\[0;7m\x0eqq"
-    expect "$IN$txt$OUT"
-}
-
-proc expectDlgRe {txt} {
-    set IN "qq\x1b\\\[0;7m\x0f"
-    set OUT "\x1b\\\[0;7m\x0eqq"
-    expect -re "$IN$txt$OUT"
-}
-
 
 # Target partition
 expectDlgRe "Slackware Linux Setup \\\(version .{1,8}\\\)"
@@ -62,16 +60,14 @@ expectDlg "SCANNING FOR CD or DVD DRIVE"
 send "\n"
 
 expectDlg "PACKAGE SERIES SELECTION"
-
-interact
-
-# Remove all package selections but 'a'
-send "a d e f k k l n t t x x x y "
 send "\n"
 
 # Full install
 expectDlg "SELECT PROMPTING MODE"
-send "f\n"
+send "c\n"
+
+expectDlg "ENTER CUSTOM EXTENSION"
+send "\n"
 
 expectDlg "MAKE USB FLASH BOOT"
 send "s\n"
@@ -91,8 +87,31 @@ send "\n"
 expectDlg "SELECT LILO DESTINATION"
 send "\n"
 
-expectDlg "MOUSE CONFIGURATION"
-send "\t\n"
+if { $mouse } {
+  expectDlg "MOUSE CONFIGURATION"
+  send "\t\n"
+}
+
+if { $network } {
+  expectDlg "CONFIGURE NETWORK?"
+  send "\n"
+
+  expectDlg "ENTER HOSTNAME"
+  send "darkstar\n"
+
+  expectDlg "ENTER DOMAINNAME FOR 'darkstar'"
+  send "localnet\n"
+
+  # DHCP
+  expectDlg "CONFIGURATION TYPE FOR 'darkstar.localnet'"
+  send "\n"
+
+  expectDlg "SET DHCP HOSTNAME"
+  send "\n"
+
+  expectDlg "CONFIRM SETUP COMPLETE"
+  send "\n"
+}
 
 expectDlg "CONFIRM STARTUP SERVICES TO RUN"
 send "\n"
@@ -148,6 +167,10 @@ expect $prompt
 send "mv /etc/inittab_tmp /etc/inittab\n"
 expect $prompt
 
+# Exit chroot
+send "exit\n"
+expect $prompt
+
 # power off, wait for shutdown then eject DVD.
 send "poweroff\n"
 
@@ -155,5 +178,5 @@ expect "reboot: Power down"
 expect eof
 catch wait result
 
-exec VBoxManage storageattach slack_test --storagectl IDE --port 1 --device 0 --type dvddrive --medium emptydrive
+exec VBoxManage storageattach $VM_NAME --storagectl IDE --port 1 --device 0 --type dvddrive --medium emptydrive
 

@@ -1,20 +1,127 @@
 #!/usr/bin/env python
 
 import os
+import six
 import explodeinstaller
+
+
+ISO_PATH = "/tmp/slackware64-14.2-install-dvd.iso"
+VM_NAME = "slack_test"
+VBOX_SOCKET = "/tmp/vbox"
+temp_dir = "tmp_dir"
+
+
+# List of packages to remove from the ISO. None of them are needed for an install to
+# Virtualbox.  The kernel is kept only because it's needed to compile the guest additions.
+to_remove = {
+    "a": "acl btrfs-progs bzip2 cpio cpufrequtils cryptsetup dialog dosfstools ed efibootmgr "
+         "eject elilo elvis eudev floppy genpower gpm gptfdisk grub hdparm infozip inotify-tools "
+         "jfsutils kernel-generic lha libcgroup lrzip lvm2 mcelog mdadm minicom mkinitrd mt-st mtx "
+         "ncompress ntfs-3g os-prober patch pciutils pcmciautils quota reiserfsprogs rpm2tgz sdparm "
+         "sharutils slocate smartmontools splitvt tcsh unarj upower usb_modeswitch usbutils "
+         "utempter xfsprogs zoo",
+    "ap": None,
+    "d": "bison ccache clisp cmake cscope cvs Cython dev86 distcc doxygen flex "
+       "gcc-gfortran gcc-gnat gcc-go gcc-objc gcc-java git gnu-cobol gperf guile help2man "
+       "indent llvm mercurial nasm oprofile p2c pmake rcs ruby scons slacktrack strace "
+       "subversion swig yasm",
+    "e": None,
+    "f": None,
+    "k": None,
+    "kde": None,
+    "kdei": None,
+    "l": None,
+    "n": "alpine autofs biff+comsat bind bluez bluez-firmware bootp bsd-finger ca-certificates "
+       "cifs-utils conntrack-tools crda cyrus-sasl dhcp dirmngr ebtables elm epic5 fetchmail "
+       "gnupg2 gnupg gnutils gpa gpgme htdig httpd icmpinfo idnkit iftop imapd inetd ipset "
+       "iptraf-ng ipw2100-fw ipw2100-fw irssi iw lftp libassuan libgcrypt libgpg-error libksba "
+       "libmbim libmnl libndp libnetfilter_acct libnetfilter_conntrack libnetfilter_cthelper "
+       "libnetfilter_cttimeout libnetfilter_log libnetfilter_queue libnfnetlink libnftnl "
+       "libqmi libtirpc links lynx mailx mcabber metamail mobile-broadband-provider-info "
+       "ModemManager mtr mutt nc ncftp net-snmp netatalk netkit-bootparamd netkit-ftp netkit-ntalk "
+       "netkit-routed netket-rsh netkit-rusers netkit-rwall netkit-rwho netkit-timed netpipes "
+       "nettle netwatch NetworkManager netwrite newspost nfacct nfs-utils nftables nn obexftp "
+       "openldap-client openobex openvpn p11-kit php pidentd pinentry popa3d ppp procmail proftpd "
+       "pssh pth rdist rfkill rp-pppoe rpcbind rsync samba sendmail slrn snownews stunnel "
+       "tftp-hpa tin trn ulogd uucp vlan vsftpd wireless-tools wpa_supplicant yptools ytalk "
+       "zd1211-firmware",
+    "t": None,
+    "tcl": None,
+    "x": None,
+    "xap": None,
+    "xfce": None,
+    "y": None
+}
+
+
+def get_disk_sets():
+    """
+        Get the list of disk-sets in a distribution, just a count of the directories under slackware64 for now.
+    """
+    out = []
+    parent = os.path.join(temp_dir,"isofs/slackware64")
+    for item in os.listdir(parent):
+        p = os.path.join(parent, item)
+        if os.path.isdir(p):
+            out.append(item)
+    return out
+
+
+def update_tagfiles():
+    """
+        Update contents of original tagfiles based on the list of packages to skip.
+        There's no point to keep the original tagfiles around as this is all generated.
+    """
+    for disk_set in get_disk_sets():
+        if disk_set not in to_remove:
+            continue
+        removals = to_remove[disk_set]
+        out_tags = []
+        p = os.path.join(temp_dir, "isofs/slackware64", disk_set, "tagfile")
+        print("Updating %r" % p)
+        if removals is not None:
+            removals = removals.split()
+        for line in open(p).readlines():
+            name = line.split(":")[0]
+            if (removals is None) or (name in removals):
+                out_tags.append(name + ":SKP")
+            else:
+                out_tags.append(name + ":ADD")
+        open(p, "wb").write("\n".join(out_tags))
+
+
+def is_included(name):
+    """
+        Find if the package is SKP.
+    :param name: name of package
+    :return: True/False
+    """
+    for k, v in six.iteritems(to_remove):
+        if name in v.split():
+            return False
+    return True
+
+
+def make_expect_parameters():
+    fp = open("includes.exp", "wb")
+    fp.write('set VM_NAME "%s"\n' % VM_NAME)
+    fp.write('set VBOX_SOCKET "%s"\n' % VBOX_SOCKET)
+    mouse = is_included("gpm")
+    fp.write('set mouse %s\n' % str(mouse).lower())
+    network = to_remove['n'] is not None
+    fp.write('set network %s\n' % str(network).lower())
+    fp.close()
+
 
 # Adapt a Slackware ISO so it boots over serial port
 # And then create a VirtualBox VM to run the ISO.
-
-ISO_PATH="/tmp/slackware64-14.2-install-dvd.iso"
-VM_NAME="slack_test"
-VBOX_SOCKET="/tmp/vbox"
-temp_dir="tmp_dir"
 
 os.system("rm -rf %s" % temp_dir)
 
 # Extract the ISO
 explodeinstaller.extract_all(ISO_PATH, temp_dir)
+
+update_tagfiles()
 
 CFG="tmp_dir/isofs/isolinux/isolinux.cfg"
 
@@ -25,4 +132,5 @@ open(CFG, "wb").write(data)
 
 explodeinstaller.assemble_all(temp_dir, "generated.iso")
 
-
+# Setup parameters for the auto-install expect script:
+make_expect_parameters()
