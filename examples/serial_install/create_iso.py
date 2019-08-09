@@ -13,24 +13,57 @@ temp_dir = "tmp_dir"
 
 # List of packages to remove from the ISO. None of them are needed for an install to
 # Virtualbox.  The kernel is kept only because it's needed to compile the guest additions.
+# Set disk set name to a list of packages to exclude.
+# Set to None to skip the disk set altogether.  Empty string will include all packages.
+
+# VBoxLinuxAdditions.run requires perl, bzip2, /l/gc-7.4.2- libffi, libunistr, libmpc.
 to_remove = {
-    "a": "acl btrfs-progs bzip2 cpio cpufrequtils cryptsetup dialog dosfstools ed efibootmgr "
-         "eject elilo elvis eudev floppy genpower gpm gptfdisk grub hdparm infozip inotify-tools "
+    "a": "acl btrfs-progs cpio cpufrequtils cryptsetup dialog dosfstools ed efibootmgr "
+         "eject elilo elvis floppy genpower gpm gptfdisk grub hdparm infozip inotify-tools "
          "jfsutils kernel-generic lha libcgroup lrzip lvm2 mcelog mdadm minicom mkinitrd mt-st mtx "
          "ncompress ntfs-3g os-prober patch pciutils pcmciautils quota reiserfsprogs rpm2tgz sdparm "
          "sharutils slocate smartmontools splitvt tcsh unarj upower usb_modeswitch usbutils "
          "utempter xfsprogs zoo",
     "ap": None,
     "d": "bison ccache clisp cmake cscope cvs Cython dev86 distcc doxygen flex "
-       "gcc-gfortran gcc-gnat gcc-go gcc-objc gcc-java git gnu-cobol gperf guile help2man "
+       "gcc-gfortran gcc-gnat gcc-go gcc-objc gcc-java git gnu-cobol gperf help2man "
        "indent llvm mercurial nasm oprofile p2c pmake rcs ruby scons slacktrack strace "
        "subversion swig yasm",
     "e": None,
     "f": None,
-    "k": None,
+    "k": "",
     "kde": None,
     "kdei": None,
-    "l": None,
+    "l": "ConsoleKit2 GConf LibRaw M2Crypto PyQt QScintilla a52dec aalib adwaita-icon-theme "
+       "akonadi alsa-lib alsa-oss alsa-plugins apr apr-util aspell aspell-en "
+       "at-spi2-atk at-spi2-core atk atkmm attica audiofile automoc4 babl boost cairo "
+       "cairomm chmlib clucene db42 db44 db48 dbus-glib dbus-python dconf dconf-editor "
+       "desktop-file-utils djvulibre ebook-tools eigen2 eigen3 elfutils enchant esound exiv2 "
+       "expat fftw freetype fribidi fuse gamin gcr gd gdbm gdk-pixbuf2 gegl giflib glade3 glib "
+       "glib-networking glib2 glibc glibc-i18n glibc-profile glibmm gmime gmm gmp gnome-keyring "
+       "gnome-themes-standard gnu-efi gobject-introspection grantlee gsettings-desktop-schemas "
+       "gsl gst-plugins-base gst-plugins-base0 gst-plugins-good gst-plugins-good0 gstreamer " 
+       "gstreamer0 gtk+ gtk+2 gtk+3 gtkmm2 gtkmm3 gtkspell gvfs harfbuzz herqq hicolor-icon-theme "
+       "hunspell icon-naming-utils icu4c ilmbase iso-codes jasper jemalloc js185 json-c judy " 
+       "keybinder keyutils lcms lcms2 libaio libao libarchive libart_lgpl libasyncns libatasmart "
+       "libbluedevil libcaca libcanberra libcap libcap-ng libcddb libcdio libcdio-paranoia libcroco "
+       "libdbusmenu-qt libdiscid libdvdnav libdvdread libevent libexif libfakekey libglade "
+       "libgnome-keyring libgphoto2 libgpod libgsf libical libid3tag libidl libidn libieee1284 "
+       "libimobiledevice libiodbc libjpeg-turbo libkarma liblastfm libmad libmcrypt libmcs libmng "
+       "libmowgli  libmsn libmtp libnih libnjb libnl libnl3 libnotify libodfgen libogg liboggz "
+       "liboil libpcap libplist libpng libproxy libraw1394 librevenge librsvg libsamplerate libsecret "
+       "libsigc++ libsigsegv libsndfile libsoup libspectre libssh libssh2 libtasn1 libtermcap libtheora "
+       "libtiff libusb libusb-compat libusbmuxd libvisio libvisual libvisual-plugins " 
+       "libvncserver libvorbis libvpx libwmf libwmf-docs libwnck libwpd libwpg libxklavier "
+       "libxml2 libxslt libyaml libzip loudmouth lzo media-player-info mhash mm mozilla-nss mpfr " 
+       "ncurses neon netpbm newt notify-python openexr openjpeg orc pango pangomm parted pcre phonon "
+       "phonon-gstreamer pilot-link polkit polkit-gnome polkit-qt-1 poppler poppler-data popt pulseaudio "
+       "pycairo pycups pycurl pygobject pygobject3 pygtk pyrex python-pillow qca qimageblitz qjson qt "
+       "qt-gstreamer qtscriptgenerator raptor2 rasqal readline redland sbc sdl seamonkey-solibs serf "
+       "sg3_utils shared-desktop-ontologies shared-mime-info sip slang slang1 soprano " 
+       "sound-theme-freedesktop speexdsp startup-notification strigi svgalib system-config-printer "
+       "t1lib taglib taglib-extras tango-icon-theme tango-icon-theme-extras urwid v4l-utils virtuoso-ose "
+       "vte wavpack xapian-core zlib",
     "n": "alpine autofs biff+comsat bind bluez bluez-firmware bootp bsd-finger ca-certificates "
        "cifs-utils conntrack-tools crda cyrus-sasl dhcp dirmngr ebtables elm epic5 fetchmail "
        "gnupg2 gnupg gnutils gpa gpgme htdig httpd icmpinfo idnkit iftop imapd inetd ipset "
