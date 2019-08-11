@@ -7,7 +7,7 @@ VBoxManage controlvm $VM_NAME poweroff
 VBoxManage unregistervm $VM_NAME --delete
 
 VBoxManage createvm --name $VM_NAME --register
-VBoxManage modifyvm $VM_NAME --memory 512
+VBoxManage modifyvm $VM_NAME --memory 1024
 VBoxManage modifyvm $VM_NAME --nic1 nat
 VBoxManage modifyvm $VM_NAME --boot1 dvd
 VBoxManage modifyvm $VM_NAME --graphicscontroller vmsvga
