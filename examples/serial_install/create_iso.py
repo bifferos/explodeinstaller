@@ -2,6 +2,7 @@
 
 import os
 import six
+import pycdlib
 import explodeinstaller
 
 
@@ -16,7 +17,7 @@ temp_dir = "tmp_dir"
 # Set disk set name to a list of packages to exclude.
 # Set to None to skip the disk set altogether.  Empty string will include all packages.
 
-# VBoxLinuxAdditions.run requires perl, bzip2, /l/gc-7.4.2- libffi, libunistr, libmpc.
+# VBoxLinuxAdditions.run requires perl, bzip2, /l/gc-7.4.2- libffi, libunistr, libmpc, dbus
 to_remove = {
     "a": "acl btrfs-progs cpio cpufrequtils cryptsetup dialog dosfstools ed efibootmgr "
          "eject elilo elvis floppy genpower gpm gptfdisk grub hdparm infozip inotify-tools "
@@ -148,6 +149,12 @@ def make_expect_parameters():
     fp.close()
 
 
+def additions_to_extra():
+    """Copy the additions into the extra folder"""
+    os.system("iso-read -e VBoxLinuxAdditions.run -i /opt/VirtualBox/additions/VBoxGuestAdditions.iso "
+              "-o %s/isofs/extra/VBoxLinuxAdditions.run" % temp_dir)
+
+
 # Adapt a Slackware ISO so it boots over serial port
 # And then create a VirtualBox VM to run the ISO.
 
@@ -155,6 +162,8 @@ os.system("rm -rf %s" % temp_dir)
 
 # Extract the ISO
 explodeinstaller.extract_all(ISO_PATH, temp_dir)
+
+additions_to_extra()
 
 update_tagfiles()
 
