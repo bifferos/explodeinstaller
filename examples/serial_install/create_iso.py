@@ -130,6 +130,8 @@ def is_included(name):
     :return: True/False
     """
     for k, v in six.iteritems(to_remove):
+        if v is None:
+            continue
         if name in v.split():
             return False
     return True
