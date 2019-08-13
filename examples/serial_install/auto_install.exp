@@ -177,6 +177,72 @@ expect $prompt
 send "exit\n"
 expect $prompt
 
+# Copy additions to root, so it can be run from there.
+send "cp /var/log/mount/extra/VBoxLinuxAdditions.run /mnt/root/.\n"
+expect $prompt
+# same with pub key
+send "cp /var/log/mount/extra/vagrant.pub /mnt/root/.\n"
+expect $prompt
+
+
+send "chroot /mnt\n"
+expect $prompt
+
+# Message bus needed for Additions to start.
+send "/etc/rc.d/rc.messagebus start\n"
+expect $prompt
+
+# Take snapshot to see which files changes after VBox additions install.
+#if { [catch { exec VBoxManage snapshot $VM_NAME take pre_additions } msg] } {
+#   puts "snapshot taken"
+#}
+
+send "chmod 755 /root/VBoxLinuxAdditions.run\n"
+expect $prompt
+
+# send "touch /root/start_install.txt\n"
+# expect $prompt
+
+send "/root/VBoxLinuxAdditions.run\n"
+expect $prompt
+
+# send "find /opt /lib /sbin /usr /etc -newer /root/start_install.txt > /tmp/new_files.txt\n"
+# expect $prompt
+
+# exec VBoxManage guestcontrol slack_test copyfrom --username root --password vagrant /tmp/new_files.txt new_files.txt
+
+# Setup vagrant user.
+
+send "useradd vagrant\n"
+expect $prompt
+send "mkdir -p /home/vagrant/.ssh\n"
+expect $prompt
+
+send "mv /root/vagrant.pub /home/vagrant/.ssh/authorized_keys\n"
+expect $prompt
+
+send "chown -R vagrant:users /home/vagrant\n"
+expect $prompt
+
+send "chown 0700 /home/vagrant/.ssh\n"
+expect $prompt
+send "chown 0600 /home/vagrant/.ssh/authorized_keys\n"
+expect $prompt
+
+send "passwd vagrant\n"
+expect "New password: "
+send "vagrant\n"
+expect "New password: "
+send "vagrant\n"
+expect "Re-enter new password: "
+send "vagrant\n"
+expect $prompt
+
+send "echo \"vagrant ALL=(ALL) NOPASSWD: ALL\" >> /etc/sudoers\n"
+expect $prompt
+send "echo \"UseDNS no\" >> /etc/ssh/sshd_config\n"
+expect $prompt
+
 # power off, wait for shutdown then eject DVD.
 send "poweroff\n"
 
