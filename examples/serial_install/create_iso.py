@@ -25,7 +25,14 @@ to_remove = {
          "ncompress ntfs-3g os-prober patch pciutils pcmciautils quota reiserfsprogs rpm2tgz sdparm "
          "sharutils slocate smartmontools splitvt tcsh unarj upower usb_modeswitch usbutils "
          "utempter xfsprogs zoo",
-    "ap": None,
+    "ap": "a2ps acct alsa-utils amp ash at bc bpe cdparanoia cdrdao cdrtools cgmanager cups cups-filters "
+         "dc3dd ddrescue diffstat diffutils dmapi dmidecode dvd+rw-tools enscript flac ghostscript "
+         "ghostscript-fonts-std "
+         "ghostscript-fonts gphoto2 groff gutenprint hplip htop ispell itstool jed joe jove ksh93 "
+         "libx86 linuxdoc-tools lm_sensors lsof lsscsi lxc lzip madplay man man-pages mariadb mc moc most "
+         "mpg123 nano normalize pamixer pm-utils powertop qpdf radeontool rpm rzip sc screen seejpeg "
+         "slackpkg soma sox sqlite squashfs-tools sysstat terminus-font texinfo tmux usbmuxd vbetool vim "
+         "vorbis-tools workbone xfsdump zsh",
     "d": "bison ccache clisp cmake cscope cvs Cython dev86 distcc doxygen flex "
        "gcc-gfortran gcc-gnat gcc-go gcc-objc gcc-java git gnu-cobol gperf help2man "
        "indent llvm mercurial nasm oprofile p2c pmake rcs ruby scons slacktrack strace "
@@ -155,6 +162,12 @@ def additions_to_extra():
               "-o %s/isofs/extra/VBoxLinuxAdditions.run" % temp_dir)
 
 
+def vagrant_pub_key_to_extra():
+    """Copy the additions into the extra folder"""
+    os.system("wget https://raw.githubusercontent.com/hashicorp/vagrant/master/keys/vagrant.pub"
+              " -o %s/isofs/extra/vagrant.pub" % temp_dir)
+
+
 # Adapt a Slackware ISO so it boots over serial port
 # And then create a VirtualBox VM to run the ISO.
 
@@ -164,6 +177,8 @@ os.system("rm -rf %s" % temp_dir)
 explodeinstaller.extract_all(ISO_PATH, temp_dir)
 
 additions_to_extra()
+
+vagrant_pub_key_to_extra()
 
 update_tagfiles()
 
