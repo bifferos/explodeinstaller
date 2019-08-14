@@ -12,28 +12,6 @@ including the ramdisk contents without being root, and without resorting
 to FUSE or ISO mounting, it therefore works on a Mac.
 
 
-Setup
-=====
-
-Install pycdlib, from github.  You require version 1.8, not released
-at time of writing.  Obtain pycdlib direct from:
-https://github.com/clalancette/pycdlib
-
-Install the python modules in requirements.txt.
-```
-sudo python -m pip install -r requirements.txt
-```
-should do the trick.
-
-You will need the kernel sources installed.
-
-Finally, 
-```
-sudo python setup.py install
-```
-Will install the extension.
-
-
 Exploding
 =========
 
